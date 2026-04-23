@@ -32,8 +32,18 @@ function buildMongoFilter(filters) {
 }
 
 function formatProfile(doc) {
-  const { _id, ...rest } = doc;
-  return rest;
+  return {
+    id: doc.id,
+    name: doc.name,
+    gender: doc.gender,
+    gender_probability: doc.gender_probability,
+    age: doc.age,
+    age_group: doc.age_group,
+    country_id: doc.country_id,
+    country_name: doc.country_name,
+    country_probability: doc.country_probability,
+    created_at: doc.created_at,
+  };
 }
 
 router.get("/", async (req, res) => {
@@ -170,24 +180,6 @@ router.get("/search", async (req, res) => {
       total,
       data: docs.map(formatProfile),
     });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ status: "error", message: "Server error" });
-  }
-});
-
-/**
- * GET /api/profiles/:id
- */
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const db = await getDb();
-    const doc = await db.collection("profiles").findOne({ id });
-    if (!doc) {
-      return res.status(404).json({ status: "error", message: "Profile not found" });
-    }
-    return res.json({ status: "success", data: formatProfile(doc) });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ status: "error", message: "Server error" });
